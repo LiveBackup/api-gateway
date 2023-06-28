@@ -23,9 +23,10 @@
     "eslint": "lb-eslint --report-unused-disable-directives .",
     "eslint:fix": "npm run eslint -- --fix",
     "pretest": "npm run rebuild",
-    "test": "lb-mocha --allow-console-logs \"dist/__tests__\"",
+    "test": "lb-nyc npm run mocha",
     "posttest": "npm run lint",
-    "test:dev": "lb-mocha --allow-console-logs dist/__tests__/**/*.js && npm run posttest",
+    "mocha": "lb-mocha --allow-console-logs \"dist/__tests__\"",
+    "mocha:dev": "lb-mocha --allow-console-logs dist/__tests__/**/*.js && npm run posttest",
     "docker:build": "docker build -t api .",
     "docker:run": "docker run -p 3000:3000 -d api",
     "premigrate": "npm run build",
@@ -66,6 +67,6 @@
     "@types/node": "^20.3.2",
     "eslint": "^8.43.0",
     "source-map-support": "^0.5.21",
-    "typescript": "^5.1.3"
+    "typescript": "~4.8.4"
   }
 }
