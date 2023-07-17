@@ -2,18 +2,18 @@ import {ID, field, objectType} from '@loopback/graphql';
 
 @objectType({description: 'Object representing an user account'})
 export class Account {
-  @field(type => ID)
+  @field(() => ID)
   id: string;
 
-  @field(type => String)
+  @field(() => String)
   username: string;
 
-  @field(type => String)
+  @field(() => String)
   email: string;
 
-  @field(type => Boolean)
+  @field(() => Boolean)
   isEmailVerified: boolean;
 
-  @field(type => Date)
-  registeredAt: Date;
+  @field(() => String)
+  registeredAt: string;
 }
