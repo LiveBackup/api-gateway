@@ -8,12 +8,10 @@ export class AccountResolver {
   constructor(
     @inject(UserMsServiceBindings.SERVICE)
     protected userMs: UserMsService,
-  ) { }
+  ) {}
 
   @mutation(() => Account)
-  async signUp(
-    @arg('newAccount') newAccount: NewAccount,
-  ): Promise<Account> {
+  async signUp(@arg('newAccount') newAccount: NewAccount): Promise<Account> {
     const account = await this.userMs.signUp(newAccount);
     return account;
   }

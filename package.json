@@ -67,6 +67,7 @@
     "@loopback/eslint-config": "^14.0.0",
     "@loopback/testlab": "^6.0.0",
     "@types/node": "^20.3.2",
+    "axios-mock-adapter": "^1.21.5",
     "eslint": "^8.43.0",
     "source-map-support": "^0.5.21",
     "typescript": "~4.8.4"

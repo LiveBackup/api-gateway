@@ -4,9 +4,9 @@ export type MsHttpError = {
   error: {
     statusCode: number;
     message: string;
-    details?: Array<object>
+    details?: Array<object>;
   };
-}
+};
 
 export class GraphQLError extends Error {
   statusCode: number;
@@ -20,7 +20,7 @@ export class GraphQLError extends Error {
 }
 
 export abstract class AbstractMsService {
-  protected client: Axios;
+  public readonly client: Axios;
 
   constructor(url: string, contentTypeHeader?: string) {
     this.client = new Axios({
