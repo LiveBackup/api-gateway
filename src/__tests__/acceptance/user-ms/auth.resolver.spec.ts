@@ -3,14 +3,20 @@ import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 import sinon from 'sinon';
 import {ApiGateway} from '../../../application';
+import {Account, Token} from '../../../graphql-types';
 import {MsHttpError} from '../../../services/abstract-ms.service';
 import {
   givenClient,
   givenRunningApp,
   queryGraphQL,
 } from '../../helpers/app.helper';
-import {parseSignUp} from '../../helpers/queries';
-import {givenAccount, givenNewAccount} from '../../helpers/types';
+import {parseLogin, parseSignUp} from '../../helpers/queries';
+import {
+  givenAccount,
+  givenCredentials,
+  givenNewAccount,
+  givenToken,
+} from '../../helpers/types';
 
 describe('e2e - Auth Resolver', () => {
   // Sinon sandbox
@@ -54,14 +60,13 @@ describe('e2e - Auth Resolver', () => {
 
       // Compare the expected behavior
       expect(response.statusCode).to.be.equal(200);
-      const responseData = response.body.data;
+      const responseBody = response.body;
       expect(response.body.errors).to.be.Undefined();
-      expect(responseData.signUp.id).to.be.equal(expectedAccount.id);
-      expect(responseData.signUp.username).to.be.equal(
-        expectedAccount.username,
-      );
-      expect(responseData.signUp.email).to.be.equal(expectedAccount.email);
-      expect(responseData.signUp.isEmailVerified).to.be.equal(
+      const responseData = responseBody.data.signUp as Account;
+      expect(responseData.id).to.be.equal(expectedAccount.id);
+      expect(responseData.username).to.be.equal(expectedAccount.username);
+      expect(responseData.email).to.be.equal(expectedAccount.email);
+      expect(responseData.isEmailVerified).to.be.equal(
         expectedAccount.isEmailVerified,
       );
     });
@@ -82,6 +87,55 @@ describe('e2e - Auth Resolver', () => {
       // Query the graphql server
       const requestData = parseSignUp(newAccount);
       const response = await queryGraphQL(client, requestData);
+      // Compare the expected behavior
+      expect(response.statusCode).to.be.equal(200);
+      const responseBody = response.body;
+      expect(responseBody.errors).not.to.be.Undefined();
+      const error = responseBody.errors[0];
+      expect(error.message).to.be.equal(expectedError.error.message);
+    });
+  });
+
+  describe('Login resolver', () => {
+    it('Gets a valid token', async () => {
+      // Create the mock objects
+      const credentials = givenCredentials();
+      const expectedToken = givenToken();
+
+      // Mock the post method on Axios
+      userMsMock
+        .onPost('/auth/login')
+        .reply(200, JSON.stringify(expectedToken));
+
+      // Query the graphql server
+      const requestData = parseLogin(credentials);
+      const response = await queryGraphQL(client, requestData);
+
+      // Compare the expected behavior
+      expect(response.statusCode).to.be.equal(200);
+      const responseBody = response.body;
+      expect(responseBody.erros).to.be.Undefined();
+      const responseData = responseBody.data.login as Token;
+      expect(responseData.token).to.be.equal(expectedToken.token);
+    });
+
+    it('Fails to get a valid token', async () => {
+      // Create the mocks
+      const credentials = givenCredentials();
+      const expectedError: MsHttpError = {
+        error: {
+          message: 'There already exists an account with the given email',
+          statusCode: 400,
+        },
+      };
+
+      // Mock the Post method on Axios to return the expectedAccount
+      userMsMock.onPost().reply(400, JSON.stringify(expectedError));
+
+      // Query the graphql server
+      const requestData = parseLogin(credentials);
+      const response = await queryGraphQL(client, requestData);
+
       // Compare the expected behavior
       expect(response.statusCode).to.be.equal(200);
       const responseBody = response.body;

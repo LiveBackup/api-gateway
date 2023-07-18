@@ -19,3 +19,19 @@ export const parseSignUp: ParseGraphQL = (data: object): GraphQLBody => {
     },
   };
 };
+
+export const parseLogin: ParseGraphQL = (data: object): GraphQLBody => {
+  return {
+    operationName: 'Login',
+    query: `
+      mutation Login($credentials: Credentials!) {
+        login(credentials: $credentials) {
+          token
+        }
+      }
+    `,
+    variables: {
+      credentials: data,
+    },
+  };
+};
