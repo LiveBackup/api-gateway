@@ -1,5 +1,5 @@
 import {BindingKey, inject} from '@loopback/core';
-import {Account, NewAccount} from '../graphql-types';
+import {Account, Credentials, NewAccount, Token} from '../graphql-types';
 import {AbstractMsService} from './abstract-ms.service';
 
 export namespace UserMsServiceBindings {
@@ -20,5 +20,10 @@ export class UserMsService extends AbstractMsService {
   async signUp(newAccount: NewAccount): Promise<Account> {
     const response = await this.client.post('/auth/sign-up', newAccount);
     return this.handleResponse<Account>(response);
+  }
+
+  async login(credentials: Credentials): Promise<Token> {
+    const response = await this.client.post('/auth/login', credentials);
+    return this.handleResponse<Token>(response);
   }
 }
