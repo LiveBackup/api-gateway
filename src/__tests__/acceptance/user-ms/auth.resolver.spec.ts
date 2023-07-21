@@ -10,7 +10,7 @@ import {
   givenRunningApp,
   queryGraphQL,
 } from '../../helpers/app.helper';
-import {parseLogin, parseSignUp} from '../../helpers/queries';
+import {parseLogin, parseSignUp, parseWhoAmI} from '../../helpers/queries';
 import {
   givenAccount,
   givenCredentials,
@@ -134,6 +134,80 @@ describe('e2e - Auth Resolver', () => {
 
       // Query the graphql server
       const requestData = parseLogin(credentials);
+      const response = await queryGraphQL(client, requestData);
+
+      // Compare the expected behavior
+      expect(response.statusCode).to.be.equal(200);
+      const responseBody = response.body;
+      expect(responseBody.errors).not.to.be.Undefined();
+      const error = responseBody.errors[0];
+      expect(error.message).to.be.equal(expectedError.error.message);
+    });
+  });
+
+  describe('WhoAmI resolver', () => {
+    it('Gets a valid account when providing a valid token', async () => {
+      // Mocks object
+      const expectedAccount = givenAccount();
+      const token = 'token123';
+
+      // Mock the axios call
+      userMsMock
+        .onGet('/auth/who-am-i')
+        .reply(200, JSON.stringify(expectedAccount));
+
+      // Query the GraphQL Server
+      const requestData = parseWhoAmI({});
+      const response = await queryGraphQL(client, requestData, token);
+
+      // Check the response
+      expect(response.statusCode).to.be.equal(200);
+      const responseBody = response.body;
+      expect(response.body.errors).to.be.undefined();
+      const responseData = responseBody.data.whoAmI as Account;
+      expect(responseData.id).to.be.equal(expectedAccount.id);
+      expect(responseData.email).to.be.equal(expectedAccount.email);
+      expect(responseData.username).to.be.equal(expectedAccount.username);
+    });
+
+    it('Fails to get an account when invalid token is provided', async () => {
+      // Create the mocks
+      const token = 'token1234';
+      const expectedError: MsHttpError = {
+        error: {
+          message: 'Invalid token',
+          statusCode: 401,
+        },
+      };
+
+      // Mock the Post method on Axios to return the expectedAccount
+      userMsMock
+        .onGet('/auth/who-am-i')
+        .reply(401, JSON.stringify(expectedError));
+
+      // Query the graphql server
+      const requestData = parseWhoAmI({});
+      const response = await queryGraphQL(client, requestData, token);
+
+      // Compare the expected behavior
+      expect(response.statusCode).to.be.equal(200);
+      const responseBody = response.body;
+      expect(responseBody.errors).not.to.be.Undefined();
+      const error = responseBody.errors[0];
+      expect(error.message).to.be.equal(expectedError.error.message);
+    });
+
+    it('Fails when no token is provided', async () => {
+      // Create the mocks
+      const expectedError: MsHttpError = {
+        error: {
+          message: 'No authorization header was provided',
+          statusCode: 401,
+        },
+      };
+
+      // Query the graphql server
+      const requestData = parseWhoAmI({});
       const response = await queryGraphQL(client, requestData);
 
       // Compare the expected behavior

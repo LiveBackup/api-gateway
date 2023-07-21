@@ -1,6 +1,6 @@
 export class GraphQLBody {
   query: string;
-  variables: object;
+  variables?: object;
   operationName: string;
 }
 

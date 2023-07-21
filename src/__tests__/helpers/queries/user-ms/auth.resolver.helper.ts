@@ -35,3 +35,20 @@ export const parseLogin: ParseGraphQL = (data: object): GraphQLBody => {
     },
   };
 };
+
+export const parseWhoAmI: ParseGraphQL = (_): GraphQLBody => {
+  return {
+    operationName: 'WhoAmI',
+    query: `
+      query WhoAmI {
+        whoAmI {
+          id
+          email
+          isEmailVerified
+          registeredAt
+          username
+        }
+      }
+    `,
+  };
+};
