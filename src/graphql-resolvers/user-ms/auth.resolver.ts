@@ -1,11 +1,14 @@
 import {inject} from '@loopback/core';
 import {arg, mutation, query, resolver} from '@loopback/graphql';
+import {Request, RestBindings} from '@loopback/rest';
 import {Account, Credentials, NewAccount, Token} from '../../graphql-types';
 import {UserMsService, UserMsServiceBindings} from '../../services';
 
 @resolver(() => Account)
 export class AccountResolver {
   constructor(
+    @inject(RestBindings.Http.REQUEST)
+    protected request: Request,
     @inject(UserMsServiceBindings.SERVICE)
     protected userMs: UserMsService,
   ) {}
@@ -23,7 +26,9 @@ export class AccountResolver {
   }
 
   @query(() => Account)
-  async whoAmI(@arg('id') id: string): Promise<Account> {
-    return new Account();
+  async whoAmI(): Promise<Account> {
+    this.userMs.setJwtTokenFromRequest(this.request);
+    const account = this.userMs.whoAmI();
+    return account;
   }
 }

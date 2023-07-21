@@ -17,10 +17,14 @@ export const givenClient = async function (app: ApiGateway): Promise<Client> {
 export const queryGraphQL = function (
   client: Client,
   data: GraphQLBody,
+  token?: string,
 ): supertest.Test {
-  return client
+  let test = client
     .post('/graphql')
     .set('Content-Type', 'application/json')
-    .set('Accept', 'application/json')
-    .send(data);
+    .set('Accept', 'application/json');
+
+  if (token) test = test.set('Authorization', `Bearer: ${token}`);
+
+  return test.send(data);
 };
