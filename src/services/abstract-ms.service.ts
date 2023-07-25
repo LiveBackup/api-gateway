@@ -20,14 +20,14 @@ export class GraphQLError extends Error {
 }
 
 export abstract class AbstractMsService {
-  public readonly client: Axios;
+  protected client: Axios;
 
-  constructor(url: string, contentTypeHeader?: string) {
+  constructor(url: string) {
     this.client = new Axios({
       baseURL: url,
       timeout: 5000,
       headers: {
-        'Content-Type': contentTypeHeader ?? 'application/json',
+        'Content-Type': 'application/json',
       },
       transformRequest: (data: object) => {
         return JSON.stringify(data);

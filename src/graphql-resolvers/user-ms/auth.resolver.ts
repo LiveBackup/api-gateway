@@ -5,7 +5,7 @@ import {Account, Credentials, NewAccount, Token} from '../../graphql-types';
 import {UserMsService, UserMsServiceBindings} from '../../services';
 
 @resolver(() => Account)
-export class AccountResolver {
+export class AuthResolver {
   constructor(
     @inject(RestBindings.Http.REQUEST)
     protected request: Request,
