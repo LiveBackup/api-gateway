@@ -3,7 +3,7 @@ import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 import {ApiGateway} from '../../../application';
 import {Account, Token} from '../../../graphql-types';
-import {MsHttpError} from '../../../services/abstract-ms.service';
+import {MsHttpError} from '../../../services';
 import {
   givenClient,
   givenRunningApp,
@@ -150,7 +150,7 @@ describe('e2e - Auth Resolver', () => {
         .reply(200, JSON.stringify(expectedAccount));
 
       // Query the GraphQL Server
-      const requestData = parseWhoAmI({});
+      const requestData = parseWhoAmI();
       const response = await queryGraphQL(client, requestData, token);
 
       // Check the response
@@ -200,7 +200,7 @@ describe('e2e - Auth Resolver', () => {
       };
 
       // Query the graphql server
-      const requestData = parseWhoAmI({});
+      const requestData = parseWhoAmI();
       const response = await queryGraphQL(client, requestData);
 
       // Compare the expected behavior

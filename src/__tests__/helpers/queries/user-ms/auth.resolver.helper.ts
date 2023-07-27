@@ -1,6 +1,6 @@
-import {GraphQLBody, ParseGraphQL} from '..';
+import {GraphQLBody} from '..';
 
-export const parseSignUp: ParseGraphQL = (data?: object): GraphQLBody => {
+export const parseSignUp = (data: object): GraphQLBody => {
   return {
     operationName: 'SignUp',
     query: `
@@ -20,7 +20,7 @@ export const parseSignUp: ParseGraphQL = (data?: object): GraphQLBody => {
   };
 };
 
-export const parseLogin: ParseGraphQL = (data?: object): GraphQLBody => {
+export const parseLogin = (data: object): GraphQLBody => {
   return {
     operationName: 'Login',
     query: `
@@ -36,7 +36,7 @@ export const parseLogin: ParseGraphQL = (data?: object): GraphQLBody => {
   };
 };
 
-export const parseWhoAmI: ParseGraphQL = (_): GraphQLBody => {
+export const parseWhoAmI = (): GraphQLBody => {
   return {
     operationName: 'WhoAmI',
     query: `

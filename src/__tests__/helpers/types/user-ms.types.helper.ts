@@ -1,4 +1,10 @@
-import {Account, Credentials, NewAccount, Token} from '../../../graphql-types';
+import {
+  Account,
+  Credentials,
+  Email,
+  NewAccount,
+  Token,
+} from '../../../graphql-types';
 
 export const givenNewAccount = (data?: Partial<NewAccount>): NewAccount => {
   return Object.assign(
@@ -41,4 +47,13 @@ export const givenToken = (data?: Partial<Token>): Token => {
     },
     data,
   ) as Token;
+};
+
+export const givenEmail = (data?: Partial<Email>): Email => {
+  return Object.assign(
+    {
+      email: 'testing@email.com',
+    },
+    data,
+  ) as Email;
 };

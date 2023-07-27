@@ -1,7 +1,7 @@
 import {BindingKey, BindingScope, inject, injectable} from '@loopback/core';
 import {Request} from '@loopback/rest';
-import {Account, Credentials, NewAccount, Token} from '../graphql-types';
-import {AbstractMsService, GraphQLError} from './abstract-ms.service';
+import {AbstractMsService, GraphQLError} from '.';
+import {Account, Credentials, Email, NewAccount, Token} from '../graphql-types';
 
 export namespace UserMsServiceBindings {
   export const SERVICE = BindingKey.create<UserMsService>(
@@ -55,5 +55,11 @@ export class UserMsService extends AbstractMsService {
     const path = '/account/request-email-verification';
     const response = await this.client.post(path);
     return this.handleResponse<Account>(response);
+  }
+
+  async requestPasswordRecovery(email: Email): Promise<void> {
+    const path = '/credentials/request-password-recovery';
+    const response = await this.client.post(path, email);
+    this.handleResponse<void>(response);
   }
 }

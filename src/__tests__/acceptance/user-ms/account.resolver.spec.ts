@@ -3,7 +3,7 @@ import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 import {ApiGateway} from '../../../application';
 import {Account} from '../../../graphql-types';
-import {MsHttpError} from '../../../services/abstract-ms.service';
+import {MsHttpError} from '../../../services';
 import {
   givenClient,
   givenRunningApp,
@@ -15,7 +15,7 @@ import {givenAccount} from '../../helpers/types';
 describe('e2e - Account Resolver', () => {
   // Axios Mocks
   let userMsMock: MockAdapter;
-  // And and client utilities for testing
+  // App and client utilities for testing
   let app: ApiGateway;
   let client: Client;
 
