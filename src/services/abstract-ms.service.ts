@@ -32,8 +32,8 @@ export abstract class AbstractMsService {
       transformRequest: (data: object) => {
         return JSON.stringify(data);
       },
-      transformResponse: (data: string) => {
-        return JSON.parse(data);
+      transformResponse: (data?: string) => {
+        if (data) return JSON.parse(data);
       },
     });
   }

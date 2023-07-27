@@ -1,6 +1,6 @@
-import {GraphQLBody, ParseGraphQL} from '..';
+import {GraphQLBody} from '..';
 
-export const parseRequestEmailVerification: ParseGraphQL = (_): GraphQLBody => {
+export const parseRequestEmailVerification = (): GraphQLBody => {
   return {
     operationName: 'RequestEmailVerification',
     query: `
