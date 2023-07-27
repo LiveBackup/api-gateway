@@ -50,4 +50,10 @@ export class UserMsService extends AbstractMsService {
     const response = await this.client.get('/auth/who-am-i');
     return this.handleResponse<Account>(response);
   }
+
+  async requestEmailVerification(): Promise<Account> {
+    const path = '/account/request-email-verification';
+    const response = await this.client.post(path);
+    return this.handleResponse<Account>(response);
+  }
 }
