@@ -1,7 +1,14 @@
 import {BindingKey, BindingScope, inject, injectable} from '@loopback/core';
 import {Request} from '@loopback/rest';
 import {securityId} from '@loopback/security';
-import {Account, Credentials, NewAccount, Token} from '../graphql-types';
+import {
+  Account,
+  Credentials,
+  Email,
+  NewAccount,
+  Password,
+  Token,
+} from '../graphql-types';
 import {ExtendedUserProfile} from '../strategies';
 import {AbstractMsService, GraphQLError} from './abstract-ms.service';
 
@@ -59,5 +66,29 @@ export class UserMsService extends AbstractMsService {
   async whoAmI(): Promise<Account> {
     const response = await this.client.get('/auth/who-am-i');
     return this.handleResponse<Account>(response);
+  }
+
+  async requestEmailVerification(): Promise<Account> {
+    const path = '/account/request-email-verification';
+    const response = await this.client.post(path);
+    return this.handleResponse<Account>(response);
+  }
+
+  async verifyEmail(): Promise<Account> {
+    const path = '/account/verify-email';
+    const response = await this.client.patch(path);
+    return this.handleResponse<Account>(response);
+  }
+
+  async requestPasswordRecovery(email: Email): Promise<void> {
+    const path = '/credentials/request-password-recovery';
+    const response = await this.client.post(path, email);
+    this.handleResponse<void>(response);
+  }
+
+  async updatePassword(password: Password): Promise<void> {
+    const path = '/credentials/update-password';
+    const response = await this.client.patch(path, password);
+    this.handleResponse<void>(response);
   }
 }

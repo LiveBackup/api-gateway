@@ -4,6 +4,4 @@ export class GraphQLBody {
   operationName: string;
 }
 
-export type ParseGraphQL = (data: object) => GraphQLBody;
-
 export * from './user-ms';

@@ -20,25 +20,25 @@ export class GraphQLError extends Error {
 }
 
 export abstract class AbstractMsService {
-  public readonly client: Axios;
+  protected client: Axios;
 
-  constructor(url: string, contentTypeHeader?: string) {
+  constructor(url: string) {
     this.client = new Axios({
       baseURL: url,
       timeout: 5000,
       headers: {
-        'Content-Type': contentTypeHeader ?? 'application/json',
+        'Content-Type': 'application/json',
       },
       transformRequest: (data: object) => {
         return JSON.stringify(data);
       },
-      transformResponse: (data: string) => {
-        return JSON.parse(data);
+      transformResponse: (data?: string) => {
+        if (data) return JSON.parse(data);
       },
     });
   }
 
-  handleResponse<T>(response: AxiosResponse): T {
+  protected handleResponse<T>(response: AxiosResponse): T {
     // If response status if grather of equal than 400 then request failed
     if (response.status >= 400) {
       const errorBody = response.data as MsHttpError;

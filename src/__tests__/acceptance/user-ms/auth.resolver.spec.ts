@@ -1,10 +1,9 @@
 import {Client, expect} from '@loopback/testlab';
 import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
-import sinon from 'sinon';
 import {ApiGateway} from '../../../application';
 import {Account, Token} from '../../../graphql-types';
-import {MsHttpError} from '../../../services/abstract-ms.service';
+import {MsHttpError} from '../../../services';
 import {
   givenClient,
   givenRunningApp,
@@ -19,8 +18,6 @@ import {
 } from '../../helpers/types';
 
 describe('e2e - Auth Resolver', () => {
-  // Sinon sandbox
-  const sandbox = sinon.createSandbox();
   // Axios Mocks
   let userMsMock: MockAdapter;
   // And and client utilities for testing
@@ -28,20 +25,16 @@ describe('e2e - Auth Resolver', () => {
   let client: Client;
 
   before(async () => {
+    userMsMock = new MockAdapter(axios);
     app = await givenRunningApp();
     client = await givenClient(app);
-  });
-
-  beforeEach(() => {
-    userMsMock = new MockAdapter(axios);
   });
 
   after(async () => {
     await app.stop();
   });
 
-  afterEach(async () => {
-    sandbox.restore();
+  afterEach(() => {
     userMsMock.reset();
   });
 
@@ -157,7 +150,7 @@ describe('e2e - Auth Resolver', () => {
         .reply(200, JSON.stringify(expectedAccount));
 
       // Query the GraphQL Server
-      const requestData = parseWhoAmI({});
+      const requestData = parseWhoAmI();
       const response = await queryGraphQL(client, requestData, token);
 
       // Check the response
@@ -186,7 +179,7 @@ describe('e2e - Auth Resolver', () => {
         .reply(401, JSON.stringify(expectedError));
 
       // Query the graphql server
-      const requestData = parseWhoAmI({});
+      const requestData = parseWhoAmI();
       const response = await queryGraphQL(client, requestData, token);
 
       // Compare the expected behavior
@@ -207,7 +200,7 @@ describe('e2e - Auth Resolver', () => {
       };
 
       // Query the graphql server
-      const requestData = parseWhoAmI({});
+      const requestData = parseWhoAmI();
       const response = await queryGraphQL(client, requestData);
 
       // Compare the expected behavior
