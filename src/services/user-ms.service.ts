@@ -57,6 +57,12 @@ export class UserMsService extends AbstractMsService {
     return this.handleResponse<Account>(response);
   }
 
+  async verifyEmail(): Promise<Account> {
+    const path = '/account/verify-email';
+    const response = await this.client.patch(path);
+    return this.handleResponse<Account>(response);
+  }
+
   async requestPasswordRecovery(email: Email): Promise<void> {
     const path = '/credentials/request-password-recovery';
     const response = await this.client.post(path, email);

@@ -19,4 +19,11 @@ export class AccountResolver {
     const account = await this.userMs.requestEmailVerification();
     return account;
   }
+
+  @mutation(() => Account)
+  async verifyEmail(): Promise<Account> {
+    this.userMs.setJwtTokenFromRequest(this.request);
+    const account = await this.userMs.verifyEmail();
+    return account;
+  }
 }
