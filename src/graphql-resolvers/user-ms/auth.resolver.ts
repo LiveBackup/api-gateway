@@ -4,7 +4,7 @@ import {Request, RestBindings} from '@loopback/rest';
 import {Account, Credentials, NewAccount, Token} from '../../graphql-types';
 import {UserMsService, UserMsServiceBindings} from '../../services';
 
-@resolver(() => Account)
+@resolver()
 export class AuthResolver {
   constructor(
     @inject(RestBindings.Http.REQUEST)

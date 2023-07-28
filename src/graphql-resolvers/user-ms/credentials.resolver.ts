@@ -1,10 +1,10 @@
 import {inject} from '@loopback/core';
 import {arg, mutation, resolver} from '@loopback/graphql';
 import {Request, RestBindings} from '@loopback/rest';
-import {Account, Email, Password} from '../../graphql-types';
+import {Email, Password} from '../../graphql-types';
 import {UserMsService, UserMsServiceBindings} from '../../services';
 
-@resolver(() => Account)
+@resolver()
 export class CredentialsResolver {
   constructor(
     @inject(RestBindings.Http.REQUEST)

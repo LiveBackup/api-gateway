@@ -4,7 +4,7 @@ import {Request, RestBindings} from '@loopback/rest';
 import {Account} from '../../graphql-types';
 import {UserMsService, UserMsServiceBindings} from '../../services';
 
-@resolver(() => Account)
+@resolver()
 export class AccountResolver {
   constructor(
     @inject(RestBindings.Http.REQUEST)
@@ -17,6 +17,13 @@ export class AccountResolver {
   async requestEmailVerification(): Promise<Account> {
     this.userMs.setJwtTokenFromRequest(this.request);
     const account = await this.userMs.requestEmailVerification();
+    return account;
+  }
+
+  @mutation(() => Account)
+  async verifyEmail(): Promise<Account> {
+    this.userMs.setJwtTokenFromRequest(this.request);
+    const account = await this.userMs.verifyEmail();
     return account;
   }
 }
