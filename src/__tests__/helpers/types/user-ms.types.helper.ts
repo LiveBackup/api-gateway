@@ -3,6 +3,7 @@ import {
   Credentials,
   Email,
   NewAccount,
+  Password,
   Token,
 } from '../../../graphql-types';
 
@@ -56,4 +57,13 @@ export const givenEmail = (data?: Partial<Email>): Email => {
     },
     data,
   ) as Email;
+};
+
+export const givenPassword = (data?: Partial<Password>): Password => {
+  return Object.assign(
+    {
+      password: 'strong_password',
+    },
+    data,
+  ) as Password;
 };
