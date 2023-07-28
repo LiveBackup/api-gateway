@@ -13,3 +13,17 @@ export const parseRequestPasswordRecovery = (data: object): GraphQLBody => {
     },
   };
 };
+
+export const parseUpdatePassword = (data: object): GraphQLBody => {
+  return {
+    operationName: 'UpdatePassword',
+    query: `
+      mutation UpdatePassword($password: Password!) {
+        updatePassword(password: $password)
+      }
+    `,
+    variables: {
+      password: data,
+    },
+  };
+};
