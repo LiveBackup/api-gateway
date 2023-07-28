@@ -10,6 +10,7 @@ import {
 import {ServiceMixin} from '@loopback/service-proxy';
 import path from 'path';
 import {MySequence} from './sequence';
+import {UserMsServiceBindings} from './services';
 
 export {ApplicationConfig};
 
@@ -49,5 +50,9 @@ export class ApiGateway extends BootMixin(
         nested: true,
       },
     };
+
+    // ############ ADDITIONAL BINDINGS ############
+    // UserMs Bindings
+    this.bind(UserMsServiceBindings.MS_URL).to(process.env.USER_MS_URL ?? '');
   }
 }
