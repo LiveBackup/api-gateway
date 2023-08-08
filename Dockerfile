@@ -5,9 +5,9 @@ FROM node:16-slim
 USER node
 
 # Create app directory (with user `node`)
-RUN mkdir -p /home/node/app
+RUN mkdir -p /home/node/api
 
-WORKDIR /home/node/app
+WORKDIR /home/node/api
 
 # Install app dependencies
 # A wildcard is used to ensure both package.json AND package-lock.json are copied
@@ -20,6 +20,12 @@ RUN npm install
 COPY --chown=node . .
 
 RUN npm run build
+
+# Unistall devDependencies
+RUN npm prune --production
+
+# Remove source code and build configuration
+RUN rm -rf src tsconfig.json tsconfig.tsbuildinfo
 
 # Bind to all network interfaces so that it can be mapped to the host OS
 ENV HOST=0.0.0.0 PORT=4000
