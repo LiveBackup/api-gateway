@@ -1,3 +1,4 @@
+import {registerAuthenticationStrategy} from '@loopback/authentication';
 import {BootMixin} from '@loopback/boot';
 import {ApplicationConfig} from '@loopback/core';
 import {GraphQLBindings, GraphQLComponent} from '@loopback/graphql';
@@ -11,6 +12,7 @@ import {ServiceMixin} from '@loopback/service-proxy';
 import path from 'path';
 import {MySequence} from './sequence';
 import {UserMsServiceBindings} from './services';
+import {MsAuthenticationStrategy} from './strategies';
 
 export {ApplicationConfig};
 
@@ -19,6 +21,9 @@ export class ApiGateway extends BootMixin(
 ) {
   constructor(options: ApplicationConfig = {}) {
     super(options);
+
+    // Register the custom authentication strategy
+    registerAuthenticationStrategy(this, MsAuthenticationStrategy);
 
     // Set up the custom sequence
     this.sequence(MySequence);

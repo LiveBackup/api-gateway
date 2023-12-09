@@ -1,6 +1,6 @@
 import {BindingKey, BindingScope, inject, injectable} from '@loopback/core';
 import {Request} from '@loopback/rest';
-import {AbstractMsService, GraphQLError} from '.';
+import {securityId} from '@loopback/security';
 import {
   Account,
   Credentials,
@@ -9,6 +9,8 @@ import {
   Password,
   Token,
 } from '../graphql-types';
+import {ExtendedUserProfile} from '../strategies';
+import {AbstractMsService, GraphQLError} from './abstract-ms.service';
 
 export namespace UserMsServiceBindings {
   export const SERVICE = BindingKey.create<UserMsService>(
@@ -41,6 +43,14 @@ export class UserMsService extends AbstractMsService {
       throw new GraphQLError('No authorization header was provided', 401);
 
     this.jwtToken = authorizationHeaderValue.split(' ')[1];
+  }
+
+  convertToUserProfile(account: Account): ExtendedUserProfile {
+    return {
+      [securityId]: account.id,
+      username: account.username,
+      email: account.email,
+    };
   }
 
   async signUp(newAccount: NewAccount): Promise<Account> {
