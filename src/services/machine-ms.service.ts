@@ -6,7 +6,9 @@ export namespace MachineMsServiceBindings {
   export const SERVICE = BindingKey.create<MachineMsService>(
     'services.MachineMsService',
   );
-  export const MS_URL = BindingKey.create<string>('services.UserMsService.url');
+  export const MS_URL = BindingKey.create<string>(
+    'services.MachineMsService.url',
+  );
 }
 
 @injectable({scope: BindingScope.TRANSIENT})

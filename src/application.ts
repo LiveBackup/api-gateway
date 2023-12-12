@@ -1,7 +1,10 @@
-import {registerAuthenticationStrategy} from '@loopback/authentication';
 import {BootMixin} from '@loopback/boot';
 import {ApplicationConfig} from '@loopback/core';
-import {GraphQLBindings, GraphQLComponent} from '@loopback/graphql';
+import {
+  GraphQLBindings,
+  GraphQLComponent,
+  ResolverData,
+} from '@loopback/graphql';
 import {RepositoryMixin} from '@loopback/repository';
 import {RestApplication} from '@loopback/rest';
 import {
@@ -10,9 +13,13 @@ import {
 } from '@loopback/rest-explorer';
 import {ServiceMixin} from '@loopback/service-proxy';
 import path from 'path';
+import {MSContextType, MsAuthChecker} from './checkers';
 import {MySequence} from './sequence';
-import {UserMsServiceBindings} from './services';
-import {MsAuthenticationStrategy} from './strategies';
+import {
+  MachineMsServiceBindings,
+  UserMsService,
+  UserMsServiceBindings,
+} from './services';
 
 export {ApplicationConfig};
 
@@ -23,7 +30,16 @@ export class ApiGateway extends BootMixin(
     super(options);
 
     // Register the custom authentication strategy
-    registerAuthenticationStrategy(this, MsAuthenticationStrategy);
+    this.bind(GraphQLBindings.GRAPHQL_AUTH_CHECKER).to(
+      async (resolverData: ResolverData<{}>, roles: string[]) => {
+        const userMsUrl = await this.get(UserMsServiceBindings.MS_URL);
+        const msChecker = new MsAuthChecker(new UserMsService(userMsUrl));
+        return msChecker.authenticate(
+          resolverData as ResolverData<MSContextType>,
+          roles,
+        );
+      },
+    );
 
     // Set up the custom sequence
     this.sequence(MySequence);
@@ -59,5 +75,9 @@ export class ApiGateway extends BootMixin(
     // ############ ADDITIONAL BINDINGS ############
     // UserMs Bindings
     this.bind(UserMsServiceBindings.MS_URL).to(process.env.USER_MS_URL ?? '');
+    // MachineMs Bindings
+    this.bind(MachineMsServiceBindings.MS_URL).to(
+      process.env.MACHINE_MS_URL ?? '',
+    );
   }
 }

@@ -1,6 +1,7 @@
 import {BindingKey, BindingScope, inject, injectable} from '@loopback/core';
 import {Request} from '@loopback/rest';
 import {securityId} from '@loopback/security';
+import {ExtendedUserProfile} from '../checkers';
 import {
   Account,
   Credentials,
@@ -9,7 +10,6 @@ import {
   Password,
   Token,
 } from '../graphql-types';
-import {ExtendedUserProfile} from '../strategies';
 import {AbstractMsService, GraphQLError} from './abstract-ms.service';
 
 export namespace UserMsServiceBindings {
