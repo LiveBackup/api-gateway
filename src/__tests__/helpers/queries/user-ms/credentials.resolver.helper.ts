@@ -1,6 +1,7 @@
 import {GraphQLBody} from '..';
+import {Email, Password} from '../../../../graphql-types';
 
-export const parseRequestPasswordRecovery = (data: object): GraphQLBody => {
+export const parseRequestPasswordRecovery = (email: Email): GraphQLBody => {
   return {
     operationName: 'RequestPasswordRecovery',
     query: `
@@ -9,12 +10,12 @@ export const parseRequestPasswordRecovery = (data: object): GraphQLBody => {
       }
     `,
     variables: {
-      email: data,
+      email,
     },
   };
 };
 
-export const parseUpdatePassword = (data: object): GraphQLBody => {
+export const parseUpdatePassword = (password: Password): GraphQLBody => {
   return {
     operationName: 'UpdatePassword',
     query: `
@@ -23,7 +24,7 @@ export const parseUpdatePassword = (data: object): GraphQLBody => {
       }
     `,
     variables: {
-      password: data,
+      password,
     },
   };
 };

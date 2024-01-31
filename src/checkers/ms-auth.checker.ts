@@ -20,12 +20,10 @@ export class MsAuthChecker {
     _: string[],
   ): Promise<boolean> {
     // Get the User profile if it has not been loaded to the context
-    if (!resolverData.context.currentUser) {
-      this.userMsService.setJwtTokenFromRequest(resolverData.context.req);
-      const account = await this.userMsService.whoAmI();
-      const userProfile = this.userMsService.convertToUserProfile(account);
-      resolverData.context.currentUser = userProfile;
-    }
+    this.userMsService.setJwtTokenFromRequest(resolverData.context.req);
+    const account = await this.userMsService.whoAmI();
+    const userProfile = this.userMsService.convertToUserProfile(account);
+    resolverData.context.currentUser = userProfile;
 
     return true;
   }

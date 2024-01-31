@@ -11,7 +11,11 @@ import {
 import {securityId} from '@loopback/security';
 import {MSContextType} from '../../checkers';
 import {Machine, NewMachine, NoIdMachine} from '../../graphql-types/machine-ms';
-import {MachineMsService, MachineMsServiceBindings} from '../../services';
+import {
+  GraphQLError,
+  MachineMsService,
+  MachineMsServiceBindings,
+} from '../../services';
 
 @resolver()
 export class MachineResolver {
@@ -20,7 +24,7 @@ export class MachineResolver {
     protected machineMs: MachineMsService,
     @inject(GraphQLBindings.RESOLVER_DATA)
     protected resolverData: ResolverData<MSContextType>,
-  ) { }
+  ) {}
 
   @mutation(() => Machine)
   @authorized()
@@ -37,7 +41,16 @@ export class MachineResolver {
   }
 
   @query(() => Machine)
+  @authorized()
   async getMachineById(@arg('id') id: string): Promise<Machine> {
-    return this.machineMs.findMachineById(id);
+    const {currentUser} = this.resolverData.context;
+    const machine = await this.machineMs.findMachineById(id);
+    if (machine.accountId !== currentUser[securityId])
+      throw new GraphQLError(
+        'The requested machine does not belong to the account',
+        403,
+      );
+
+    return machine;
   }
 }
