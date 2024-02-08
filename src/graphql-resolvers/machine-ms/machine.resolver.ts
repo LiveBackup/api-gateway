@@ -53,4 +53,13 @@ export class MachineResolver {
 
     return machine;
   }
+
+  @query(() => [Machine])
+  @authorized()
+  async getAccountMachines(): Promise<Machine[]> {
+    const {currentUser} = this.resolverData.context;
+    const accountId = currentUser[securityId];
+    const machines = await this.machineMs.findMachinesByAccountId(accountId);
+    return machines;
+  }
 }

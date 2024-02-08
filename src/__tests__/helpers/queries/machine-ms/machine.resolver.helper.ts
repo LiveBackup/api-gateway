@@ -36,3 +36,18 @@ export const parseGetMachineById = (id: string): GraphQLBody => {
     },
   };
 };
+
+export const parseGetAccountMachines = (): GraphQLBody => {
+  return {
+    operationName: 'GetAccountMachines',
+    query: `
+      query GetAccountMachines {
+        getAccountMachines {
+          id,
+          name,
+          accountId
+        }
+      }
+    `,
+  };
+};
