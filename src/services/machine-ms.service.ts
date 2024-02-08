@@ -1,5 +1,5 @@
 import {BindingKey, BindingScope, inject, injectable} from '@loopback/core';
-import {Machine, NoIdMachine} from '../graphql-types/machine-ms';
+import {Machine, NewMachine, NoIdMachine} from '../graphql-types/machine-ms';
 import {AbstractMsService} from './abstract-ms.service';
 
 export namespace MachineMsServiceBindings {
@@ -35,8 +35,11 @@ export class MachineMsService extends AbstractMsService {
     return this.handleResponse<Machine[]>(response);
   }
 
-  async updateMachineById(id: string, newInfo: NoIdMachine): Promise<Machine> {
-    const response = await this.client.put(`/machine/${id}`, newInfo);
+  async updateMachineById(
+    id: string,
+    newData: Partial<NewMachine>,
+  ): Promise<Machine> {
+    const response = await this.client.put(`/machine/${id}`, newData);
     return this.handleResponse<Machine>(response);
   }
 

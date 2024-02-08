@@ -13,9 +13,7 @@ export const parseCreateMachine = (newMachine: NewMachine): GraphQLBody => {
         }
       }
     `,
-    variables: {
-      newMachine,
-    },
+    variables: {newMachine},
   };
 };
 
@@ -31,9 +29,7 @@ export const parseGetMachineById = (id: string): GraphQLBody => {
         }
       }
     `,
-    variables: {
-      id,
-    },
+    variables: {id},
   };
 };
 
@@ -49,5 +45,24 @@ export const parseGetAccountMachines = (): GraphQLBody => {
         }
       }
     `,
+  };
+};
+
+export const parseUpdateMachine = (
+  id: string,
+  newData: Partial<NewMachine>,
+): GraphQLBody => {
+  return {
+    operationName: 'UpdateMachine',
+    query: `
+      mutation UpdateMachine($id: String!, $newData: NewMachine!) {
+        updateMachine(id: $id, newData: $newData) {
+          id,
+          name,
+          accountId,
+        }
+      }
+    `,
+    variables: {id, newData},
   };
 };

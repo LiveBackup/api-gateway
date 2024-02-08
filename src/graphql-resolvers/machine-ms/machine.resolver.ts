@@ -62,4 +62,19 @@ export class MachineResolver {
     const machines = await this.machineMs.findMachinesByAccountId(accountId);
     return machines;
   }
+
+  @mutation(() => Machine)
+  @authorized()
+  async updateMachine(
+    @arg('id') id: string,
+    @arg('newData') newData: NewMachine,
+  ): Promise<Machine> {
+    const {currentUser} = this.resolverData.context;
+    const existingMachine = await this.getMachineById(id);
+    if (existingMachine.accountId !== currentUser[securityId]) {
+      throw new GraphQLError('The requester is not the machine owner', 403);
+    }
+
+    return this.machineMs.updateMachineById(id, newData);
+  }
 }

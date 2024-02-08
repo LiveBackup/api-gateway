@@ -3,6 +3,7 @@ import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 import {ApiGateway} from '../../../application';
 import {Machine, NewMachine} from '../../../graphql-types/machine-ms';
+import {MsHttpError} from '../../../services';
 import {
   givenClient,
   givenRunningApp,
@@ -12,6 +13,7 @@ import {
   parseCreateMachine,
   parseGetAccountMachines,
   parseGetMachineById,
+  parseUpdateMachine,
 } from '../../helpers/queries/machine-ms';
 import {givenAccount, givenMachine} from '../../helpers/types';
 
@@ -178,6 +180,106 @@ describe('e2e - Machine Resolver', () => {
       // Verify the response
       const responseData = responseBody.data.getAccountMachines as Machine[];
       expect(responseData).to.be.deepEqual(expectedMachines);
+    });
+  });
+
+  describe('UpdateMachine resolver', () => {
+    it('Updates the machine', async () => {
+      // Create the mocks
+      const mockAccount = givenAccount();
+      const expectedMachine = givenMachine({accountId: mockAccount.id});
+      const token = 'token123';
+
+      // Mock the UserMS response
+      axiosMock.onGet('/auth/who-am-i').reply(200, JSON.stringify(mockAccount));
+      // Mock the MachineMS response
+      // Mock the MachineMS response
+      axiosMock
+        .onGet(`/machine/${expectedMachine.id}`)
+        .reply(200, JSON.stringify(expectedMachine));
+      axiosMock
+        .onPut(`/machine/${expectedMachine.id}`)
+        .reply(200, JSON.stringify(expectedMachine));
+
+      // Query the GraphQL Server
+      const requestData = parseUpdateMachine(expectedMachine.id, {
+        name: expectedMachine.name,
+      });
+      const response = await queryGraphQL(client, requestData, token);
+
+      // Check the response
+      expect(response.statusCode).to.be.equal(200);
+      const responseBody = response.body;
+      // Check there are no errors
+      expect(responseBody.errors).to.be.undefined();
+      // Verify the response
+      const responseData = responseBody.data.updateMachine as Machine;
+      expect(responseData.id).to.be.equal(expectedMachine.id);
+      expect(responseData.name).to.be.equal(expectedMachine.name);
+      expect(responseData.accountId).to.be.equal(mockAccount.id);
+    });
+
+    it('Does not find the machine', async () => {
+      // Create the mocks
+      const mockAccount = givenAccount();
+      const expectedError: MsHttpError = {
+        error: {
+          message: 'Machine not found',
+          statusCode: 404,
+        },
+      };
+      const token = 'token123';
+
+      // Mock the UserMS response
+      axiosMock.onGet('/auth/who-am-i').reply(200, JSON.stringify(mockAccount));
+      // Mock the MachineMS response
+      axiosMock
+        .onGet(`/machine/some-id`)
+        .reply(404, JSON.stringify(expectedError));
+
+      // Query the GraphQL Server
+      const requestData = parseUpdateMachine('some-id', {
+        name: 'expectedMachine.name',
+      });
+      const response = await queryGraphQL(client, requestData, token);
+
+      // Check the response
+      expect(response.statusCode).to.be.equal(200);
+      const responseBody = response.body;
+      // Verify there is an error
+      expect(responseBody.errors).not.to.be.undefined();
+      expect(
+        responseBody.errors[0].extensions.exception.statusCode,
+      ).to.be.equal(404);
+    });
+
+    it('Fails to update the machine since the requester is not the owner', async () => {
+      // Create the mocks
+      const mockAccount = givenAccount();
+      const expectedMachine = givenMachine({accountId: 'some_other_id'});
+      const token = 'token123';
+
+      // Mock the UserMS response
+      axiosMock.onGet('/auth/who-am-i').reply(200, JSON.stringify(mockAccount));
+      // Mock the MachineMS response
+      axiosMock
+        .onGet(`/machine/${expectedMachine.id}`)
+        .reply(200, JSON.stringify(expectedMachine));
+
+      // Query the GraphQL Server
+      const requestData = parseUpdateMachine(expectedMachine.id, {
+        name: expectedMachine.name,
+      });
+      const response = await queryGraphQL(client, requestData, token);
+
+      // Check the response
+      expect(response.statusCode).to.be.equal(200);
+      const responseBody = response.body;
+      // Verify there is an error
+      expect(responseBody.errors).not.to.be.undefined();
+      expect(
+        responseBody.errors[0].extensions.exception.statusCode,
+      ).to.be.equal(403);
     });
   });
 });
