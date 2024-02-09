@@ -66,3 +66,19 @@ export const parseUpdateMachine = (
     variables: {id, newData},
   };
 };
+
+export const parseDeleteMachine = (id: string): GraphQLBody => {
+  return {
+    operationName: 'DeleteMachine',
+    query: `
+      mutation DeleteMachine($id: String!) {
+        deleteMachine(id: $id) {
+          id,
+          name,
+          accountId,
+        }
+      }
+    `,
+    variables: {id},
+  };
+};
