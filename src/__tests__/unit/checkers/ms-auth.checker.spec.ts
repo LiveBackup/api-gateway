@@ -1,23 +1,34 @@
+import {ResolverData} from '@loopback/graphql';
 import {securityId} from '@loopback/security';
 import {expect, stubExpressContext} from '@loopback/testlab';
 import sinon from 'sinon';
+import {MSContextType, MsAuthChecker} from '../../../checkers';
 import {GraphQLError, UserMsService} from '../../../services';
-import {MsAuthenticationStrategy} from '../../../strategies';
 import {givenAccount} from '../../helpers/types';
 
-describe('Unit - MsAuthenticationStrategy', () => {
+describe('Unit - MsAuthChecker', () => {
   // Sandbox
   const sandbox = sinon.createSandbox();
   // Services
   let userMsService: UserMsService;
-  // Straregy
-  let msAuthenticationStrategy: MsAuthenticationStrategy;
-  // Mock request
-  const mockRequest = stubExpressContext().request;
+  // Checker
+  let msAuthChecker: MsAuthChecker;
+  // Mock Resolver Data
+  let resolverDataMock: ResolverData<MSContextType>;
 
   beforeEach(() => {
     userMsService = new UserMsService('');
-    msAuthenticationStrategy = new MsAuthenticationStrategy(userMsService);
+    msAuthChecker = new MsAuthChecker(userMsService);
+    // Restore the resolverDataMock
+    resolverDataMock = {
+      root: {},
+      args: {},
+      info: Object.assign({}),
+      context: Object.assign({
+        req: stubExpressContext(),
+        currentUser: undefined,
+      }),
+    };
   });
 
   afterEach(() => {
@@ -34,10 +45,9 @@ describe('Unit - MsAuthenticationStrategy', () => {
     sandbox.stub(userMsService, 'whoAmI').returns(Promise.resolve(mockAccount));
 
     // Execute the authentication method
-    const userProfile = await msAuthenticationStrategy.authenticate(
-      mockRequest,
-    );
+    await msAuthChecker.authenticate(resolverDataMock, []);
 
+    const userProfile = resolverDataMock.context.currentUser;
     expect(userProfile).not.to.be.Undefined();
     expect(userProfile?.[securityId]).to.be.equal(mockAccount.id);
     expect(userProfile?.username).to.be.equal(mockAccount.username);
@@ -58,7 +68,7 @@ describe('Unit - MsAuthenticationStrategy', () => {
     // Test the authentication method
     let actualError: GraphQLError | undefined = undefined;
     try {
-      await msAuthenticationStrategy.authenticate(mockRequest);
+      await msAuthChecker.authenticate(resolverDataMock, []);
     } catch (err) {
       actualError = err;
     }
@@ -92,7 +102,7 @@ describe('Unit - MsAuthenticationStrategy', () => {
       // Execute the authentication method
       let actualError: GraphQLError | undefined = undefined;
       try {
-        await msAuthenticationStrategy.authenticate(mockRequest);
+        await msAuthChecker.authenticate(resolverDataMock, []);
       } catch (err) {
         actualError = err;
       }

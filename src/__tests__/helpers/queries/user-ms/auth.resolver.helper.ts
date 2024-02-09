@@ -1,6 +1,7 @@
 import {GraphQLBody} from '..';
+import {Credentials, NewAccount} from '../../../../graphql-types';
 
-export const parseSignUp = (data: object): GraphQLBody => {
+export const parseSignUp = (newAccount: NewAccount): GraphQLBody => {
   return {
     operationName: 'SignUp',
     query: `
@@ -15,12 +16,12 @@ export const parseSignUp = (data: object): GraphQLBody => {
       }
     `,
     variables: {
-      newAccount: data,
+      newAccount,
     },
   };
 };
 
-export const parseLogin = (data: object): GraphQLBody => {
+export const parseLogin = (credentials: Credentials): GraphQLBody => {
   return {
     operationName: 'Login',
     query: `
@@ -31,7 +32,7 @@ export const parseLogin = (data: object): GraphQLBody => {
       }
     `,
     variables: {
-      credentials: data,
+      credentials,
     },
   };
 };
