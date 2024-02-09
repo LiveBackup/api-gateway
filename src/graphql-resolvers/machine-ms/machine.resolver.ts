@@ -70,7 +70,9 @@ export class MachineResolver {
     @arg('newData') newData: NewMachine,
   ): Promise<Machine> {
     const {currentUser} = this.resolverData.context;
-    const existingMachine = await this.getMachineById(id);
+    console.log(currentUser);
+    const existingMachine = await this.machineMs.findMachineById(id);
+    console.log(existingMachine);
     if (existingMachine.accountId !== currentUser[securityId]) {
       throw new GraphQLError('The requester is not the machine owner', 403);
     }
@@ -82,7 +84,7 @@ export class MachineResolver {
   @authorized()
   async deleteMachine(@arg('id') id: string): Promise<Machine> {
     const {currentUser} = this.resolverData.context;
-    const existingMachine = await this.getMachineById(id);
+    const existingMachine = await this.machineMs.findMachineById(id);
     if (existingMachine.accountId !== currentUser[securityId]) {
       throw new GraphQLError('The requester is not the machine owner', 403);
     }

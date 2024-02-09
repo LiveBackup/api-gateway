@@ -39,7 +39,7 @@ export abstract class AbstractMsService {
   }
 
   protected handleResponse<T>(response: AxiosResponse): T {
-    // If response status if grather of equal than 400 then request failed
+    // If response status if grather of equal than 400 then the request failed
     if (response.status >= 400) {
       const errorBody = response.data as MsHttpError;
       const {message, statusCode, details} = errorBody.error;
