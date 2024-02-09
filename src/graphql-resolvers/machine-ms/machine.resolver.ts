@@ -70,9 +70,7 @@ export class MachineResolver {
     @arg('newData') newData: NewMachine,
   ): Promise<Machine> {
     const {currentUser} = this.resolverData.context;
-    console.log(currentUser);
     const existingMachine = await this.machineMs.findMachineById(id);
-    console.log(existingMachine);
     if (existingMachine.accountId !== currentUser[securityId]) {
       throw new GraphQLError('The requester is not the machine owner', 403);
     }

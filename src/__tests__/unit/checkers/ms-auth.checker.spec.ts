@@ -39,26 +39,34 @@ describe('Unit - MsAuthChecker', () => {
     const mockAccount = givenAccount();
 
     // Stub the userMs.parseJwt method
-    sandbox.stub(userMsService, 'setJwtTokenFromRequest').returns();
+    const setJwtStub = sandbox
+      .stub(userMsService, 'setJwtTokenFromRequest')
+      .returns();
 
     // Stub the WhoAmI call
-    sandbox.stub(userMsService, 'whoAmI').returns(Promise.resolve(mockAccount));
+    const whoAmIStub = sandbox
+      .stub(userMsService, 'whoAmI')
+      .returns(Promise.resolve(mockAccount));
 
     // Execute the authentication method
     await msAuthChecker.authenticate(resolverDataMock, []);
 
+    // Check the userProfile loaded info
     const userProfile = resolverDataMock.context.currentUser;
     expect(userProfile).not.to.be.Undefined();
     expect(userProfile?.[securityId]).to.be.equal(mockAccount.id);
     expect(userProfile?.username).to.be.equal(mockAccount.username);
     expect(userProfile?.email).to.be.equal(mockAccount.email);
+    // Check the stub and spy calls
+    sandbox.assert.calledOnce(setJwtStub);
+    sandbox.assert.calledOnce(whoAmIStub);
   });
 
   it('Rejects when no Token is provided', async () => {
     const expectedError = new GraphQLError('No token provided', 401);
 
     // Stub the parseJwt method
-    const parseJwtStub = sandbox
+    const setJwtStub = sandbox
       .stub(userMsService, 'setJwtTokenFromRequest')
       .throws(expectedError);
 
@@ -77,8 +85,8 @@ describe('Unit - MsAuthChecker', () => {
     expect(actualError?.message).to.be.equal(expectedError.message);
     expect(actualError?.statusCode).to.be.equal(expectedError.statusCode);
     // Check the stub and spy calls
-    expect(parseJwtStub.calledOnce).to.be.True();
-    expect(whoAmISpy.calledOnce).not.to.be.True();
+    sandbox.assert.calledOnce(setJwtStub);
+    sandbox.assert.notCalled(whoAmISpy);
   });
 
   it('Rejects with error codes in Ms call', async () => {
@@ -94,10 +102,14 @@ describe('Unit - MsAuthChecker', () => {
       sandbox.restore();
 
       // Create the parseJwt stub
-      sandbox.stub(userMsService, 'setJwtTokenFromRequest').returns();
+      const setJwtStub = sandbox
+        .stub(userMsService, 'setJwtTokenFromRequest')
+        .returns();
 
       // Create the MsStub returning the error
-      sandbox.stub(userMsService, 'whoAmI').throws(expectedError);
+      const whoAmIStub = sandbox
+        .stub(userMsService, 'whoAmI')
+        .throws(expectedError);
 
       // Execute the authentication method
       let actualError: GraphQLError | undefined = undefined;
@@ -110,6 +122,9 @@ describe('Unit - MsAuthChecker', () => {
       expect(actualError).not.to.be.Undefined();
       expect(actualError?.message).to.be.equal(expectedError.message);
       expect(actualError?.statusCode).to.be.equal(expectedError.statusCode);
+      // Check the stub and spy calls
+      sandbox.assert.calledOnce(setJwtStub);
+      sandbox.assert.calledOnce(whoAmIStub);
     }
   });
 });
