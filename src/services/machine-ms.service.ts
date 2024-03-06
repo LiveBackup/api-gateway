@@ -1,50 +1,50 @@
 import {BindingKey, BindingScope, inject, injectable} from '@loopback/core';
+import {IHttpAdapter} from '../adapters/http-adapters';
 import {Machine, NewMachine, NoIdMachine} from '../graphql-types/machine-ms';
-import {AbstractMsService} from './abstract-ms.service';
 
 export namespace MachineMsServiceBindings {
   export const SERVICE = BindingKey.create<MachineMsService>(
     'services.MachineMsService',
   );
-  export const MS_URL = BindingKey.create<string>(
-    'services.MachineMsService.url',
+  export const HTTP_ADAPTER = BindingKey.create<IHttpAdapter>(
+    'services.MachineMsService.http-adapter',
   );
 }
 
 @injectable({scope: BindingScope.TRANSIENT})
-export class MachineMsService extends AbstractMsService {
+export class MachineMsService {
   constructor(
-    @inject(MachineMsServiceBindings.MS_URL)
-    msUrl: string,
-  ) {
-    super(msUrl);
-  }
+    @inject(MachineMsServiceBindings.HTTP_ADAPTER)
+    private readonly client: IHttpAdapter,
+  ) {}
 
   async createMachine(newMachine: NoIdMachine): Promise<Machine> {
-    const response = await this.client.post('/machine', newMachine);
-    return this.handleResponse<Machine>(response);
+    const response = await this.client.post<Machine>('/machine', newMachine);
+    return response.data;
   }
 
   async findMachineById(id: string): Promise<Machine> {
-    const response = await this.client.get(`/machine/${id}`);
-    return this.handleResponse<Machine>(response);
+    const response = await this.client.get<Machine>(`/machine/${id}`);
+    return response.data;
   }
 
   async findMachinesByAccountId(accountId: string): Promise<Machine[]> {
-    const response = await this.client.get(`/account/${accountId}/machines`);
-    return this.handleResponse<Machine[]>(response);
+    const response = await this.client.get<Machine[]>(
+      `/account/${accountId}/machines`,
+    );
+    return response.data;
   }
 
   async updateMachineById(
     id: string,
     newData: Partial<NewMachine>,
   ): Promise<Machine> {
-    const response = await this.client.put(`/machine/${id}`, newData);
-    return this.handleResponse<Machine>(response);
+    const response = await this.client.put<Machine>(`/machine/${id}`, newData);
+    return response.data;
   }
 
   async deleteMachineById(id: string): Promise<Machine> {
-    const response = await this.client.delete(`/machine/${id}`);
-    return this.handleResponse<Machine>(response);
+    const response = await this.client.delete<Machine>(`/machine/${id}`);
+    return response.data;
   }
 }

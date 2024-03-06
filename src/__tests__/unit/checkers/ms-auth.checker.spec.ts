@@ -2,6 +2,7 @@ import {ResolverData} from '@loopback/graphql';
 import {securityId} from '@loopback/security';
 import {expect, stubExpressContext} from '@loopback/testlab';
 import sinon from 'sinon';
+import {AxiosAdapter} from '../../../adapters/http-adapters';
 import {MSContextType, MsAuthChecker} from '../../../checkers';
 import {GraphQLError, UserMsService} from '../../../services';
 import {givenAccount} from '../../helpers/types';
@@ -17,7 +18,7 @@ describe('Unit - MsAuthChecker', () => {
   let resolverDataMock: ResolverData<MSContextType>;
 
   beforeEach(() => {
-    userMsService = new UserMsService('');
+    userMsService = new UserMsService(new AxiosAdapter(''));
     msAuthChecker = new MsAuthChecker(userMsService);
     // Restore the resolverDataMock
     resolverDataMock = {

@@ -7,12 +7,9 @@ import {
 } from '@loopback/graphql';
 import {RepositoryMixin} from '@loopback/repository';
 import {RestApplication} from '@loopback/rest';
-import {
-  RestExplorerBindings,
-  RestExplorerComponent,
-} from '@loopback/rest-explorer';
 import {ServiceMixin} from '@loopback/service-proxy';
 import path from 'path';
+import {AxiosAdapter} from './adapters/http-adapters';
 import {MSContextType, MsAuthChecker} from './checkers';
 import {MySequence} from './sequence';
 import {
@@ -32,7 +29,7 @@ export class ApiGateway extends BootMixin(
     // Register the custom authentication strategy
     this.bind(GraphQLBindings.GRAPHQL_AUTH_CHECKER).to(
       async (resolverData: ResolverData<{}>, roles: string[]) => {
-        const userMsUrl = await this.get(UserMsServiceBindings.MS_URL);
+        const userMsUrl = await this.get(UserMsServiceBindings.HTTP_ADAPTER);
         const msChecker = new MsAuthChecker(new UserMsService(userMsUrl));
         return msChecker.authenticate(
           resolverData as ResolverData<MSContextType>,
@@ -46,22 +43,15 @@ export class ApiGateway extends BootMixin(
 
     // Configure GraphQL
     this.component(GraphQLComponent);
-    this.configure(GraphQLBindings.GRAPHQL_SERVER).to({
-      asMiddlewareOnly: true,
-    });
+    this.configure(GraphQLBindings.GRAPHQL_SERVER).to({asMiddlewareOnly: true});
     const server = this.getSync(GraphQLBindings.GRAPHQL_SERVER);
     this.expressMiddleware('middleware.express.GraphQL', server.expressApp);
 
-    // Set up default home page
-    this.static('/', path.join(__dirname, '../public'));
-
-    // Customize @loopback/rest-explorer configuration here
-    this.configure(RestExplorerBindings.COMPONENT).to({
-      path: '/explorer',
-    });
-    this.component(RestExplorerComponent);
-
+    // Set project root
     this.projectRoot = __dirname;
+    // Set up default home page
+    this.static('/', path.join(this.projectRoot, '../public'));
+
     // Customize @loopback/boot Booter Conventions here
     this.bootOptions = {
       graphqlResolvers: {
@@ -74,10 +64,12 @@ export class ApiGateway extends BootMixin(
 
     // ############ ADDITIONAL BINDINGS ############
     // UserMs Bindings
-    this.bind(UserMsServiceBindings.MS_URL).to(process.env.USER_MS_URL ?? '');
+    this.bind(UserMsServiceBindings.HTTP_ADAPTER).to(
+      new AxiosAdapter(process.env.USER_MS_URL ?? ''),
+    );
     // MachineMs Bindings
-    this.bind(MachineMsServiceBindings.MS_URL).to(
-      process.env.MACHINE_MS_URL ?? '',
+    this.bind(MachineMsServiceBindings.HTTP_ADAPTER).to(
+      new AxiosAdapter(process.env.MACHINE_MS_URL ?? ''),
     );
   }
 }

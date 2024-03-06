@@ -1,12 +1,13 @@
 import {expect, stubExpressContext} from '@loopback/testlab';
 import sinon from 'sinon';
+import {AxiosAdapter} from '../../../adapters/http-adapters';
 import {GraphQLError, UserMsService} from '../../../services';
 
 describe('Unit - UserMs service', () => {
   // Sandbox
   const sandbox = sinon.createSandbox();
   // Services
-  const userMs = new UserMsService('');
+  const userMs = new UserMsService(new AxiosAdapter(''));
 
   afterEach(() => {
     sandbox.restore();

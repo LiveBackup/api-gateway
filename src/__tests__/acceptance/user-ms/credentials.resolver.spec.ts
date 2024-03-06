@@ -83,7 +83,7 @@ describe('e2e - Credentials Resolver', () => {
 
   describe('UpdatePasswordResolver', () => {
     it('Updates the password', async () => {
-      // Create the moch objects
+      // Create the mock objects
       const token = 'token123';
       const passwordUpdate = givenPassword({password: 'new_strong_password'});
 
